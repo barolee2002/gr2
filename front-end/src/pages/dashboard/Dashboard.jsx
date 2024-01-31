@@ -1,0 +1,511 @@
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
+import Paper from '@mui/material/Paper';
+import Timeline from '@mui/lab/Timeline';
+import TimelineItem from '@mui/lab/TimelineItem';
+import TimelineSeparator from '@mui/lab/TimelineSeparator';
+import TimelineConnector from '@mui/lab/TimelineConnector';
+import TimelineContent from '@mui/lab/TimelineContent';
+import TimelineDot from '@mui/lab/TimelineDot';
+import TimelineOppositeContent, { timelineOppositeContentClasses } from '@mui/lab/TimelineOppositeContent';
+import ArrowCircleRightOutlinedIcon from '@mui/icons-material/ArrowCircleRightOutlined';
+import { Bar } from 'react-chartjs-2';
+import { CategoryScale } from 'chart.js';
+import Chart from 'chart.js/auto';
+import * as React from 'react';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import ListItemText from '@mui/material/ListItemText';
+import Avatar from '@mui/material/Avatar';
+import Numeral from 'react-numeral';
+import axios from 'axios';
+import { subDays, format } from 'date-fns';
+import { apiBaseUrl } from '../../constant/constant';
+import { getCookie } from '../../utils/api';
+import Person3Icon from '@mui/icons-material/Person3';
+import { AuthContext } from '../../context/AuthContext';
+
+Chart.register(CategoryScale);
+
+// const cx = classNames.bind(styles);
+
+const BoxItem = function ({ title, content, backgroundColor, icon, noMargin }) {
+    return (
+        <Box
+            sx={{
+                backgroundColor: 'white',
+                width: '281px',
+                height: '158px',
+                boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+                borderRadius: '6px',
+                marginRight: noMargin ? '0' : 'auto',
+            }}
+        >
+            <Button sx={{ width: '100%', height: '100%' }} endIcon={icon}>
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        width: '150px',
+                    }}
+                >
+                    <span style={{ fontSize: '16px', color: 'black' }}>{title}</span>
+                    <span style={{ fontSize: '18px', color: backgroundColor }}>{content}</span>
+                </div>
+            </Button>
+        </Box>
+    );
+};
+
+
+const options = {
+    scales: {
+        x: {
+            grid: {
+                display: false,
+            },
+        },
+        y: {
+            ticks: {
+                callback: (value) => value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','),
+            },
+        },
+    },
+    plugins: {
+        legend: {
+            display: false,
+        },
+        tooltip: {
+            callbacks: {
+                label: (context) => {
+                    const value = context.parsed.y.toLocaleString('en-US');
+                    return `Doanh thu: ${value}`;
+                },
+            },
+        },
+    },
+};
+
+const generateLabels = (num) => {
+    const now = new Date(); // Lấy thời điểm hiện tại
+    const days = []; // Mảng lưu trữ các ngày trong khoảng 7 ngày
+
+    for (let i = num - 1; i >= 0; i--) {
+        const date = subDays(now, i); // Tính toán ngày trong khoảng 7 ngày
+        const formattedDate = format(date, 'dd/MM'); // Chuyển đổi ngày thành chuỗi định dạng dd/MM/yyyy
+        days.push(formattedDate); // Thêm ngày vào mảng
+    }
+
+    return days;
+};
+
+const labelsInit = generateLabels(7);
+
+function DashBoard() {
+    const [filter, setFilter] = React.useState(7);
+    const user = React.useContext(AuthContext)
+    console.log(user.state);
+    const [revenue, setRevenue] = React.useState(0);
+    const [sold, setSold] = React.useState(0);
+    const [quantity, setQuantity] = React.useState(0);
+    const [topProduct, setTopProduct] = React.useState([]);
+    const [topCustomer, setTopCustomer] = React.useState([]);
+    const [start, setStart] = React.useState(format(subDays(new Date(), 6), 'dd/MM/yyyy'));
+    const [end, setEnd] = React.useState(format(new Date(), 'dd/MM/yyyy'));
+    const [labels, setLabels] = React.useState(labelsInit);
+    const [data, setData] = React.useState([0]);
+    const [history, setHistory] = React.useState([]);
+    const [newOrders, setNewOrders] = React.useState(0);
+    const [newCustomers, setNewCustomers] = React.useState(0);
+
+    const handleChange = (event) => {
+        setFilter(event.target.value);
+        if (event.target.value === 7) {
+            const labelsInit = generateLabels(7);
+            setLabels(labelsInit);
+            setStart(format(subDays(new Date(), 6), 'dd/MM/yyyy'));
+            setEnd(format(new Date(), 'dd/MM/yyyy'));
+        } else if (event.target.value === 30) {
+            const labelsInit = generateLabels(30);
+            setLabels(labelsInit);
+            setStart(format(subDays(new Date(), 30), 'dd/MM/yyyy'));
+            setEnd(format(new Date(), 'dd/MM/yyyy'));
+        }
+    };
+
+    const fetchNewOrders = () => {
+        return axios.get(`${apiBaseUrl}/statistical/orders/count`, {
+            headers: {
+                // token: Cookies.get('token'),
+                Authorization: getCookie('Authorization'),
+            },
+        });
+    };
+
+    const fetchNewCustomers = () => {
+        return axios.get(`${apiBaseUrl}/statistical/customers/count`, {
+            headers: {
+                // token: Cookies.get('token'),
+                Authorization: getCookie('Authorization'),
+            },
+        });
+    };
+
+    const fetchRevenue = () => {
+        return axios.get(`${apiBaseUrl}/statistical/revenue`, {
+            headers: {
+                // token: Cookies.get('token'),
+                Authorization: getCookie('Authorization'),
+            },
+        });
+    };
+
+    const fetchHistory = () => {
+        return axios.get(`${apiBaseUrl}/history`, {
+            headers: {
+                // token: Cookies.get('token'),
+                Authorization: getCookie('Authorization'),
+            },
+        });
+    };
+
+    const fetchSold = () => {
+        return axios.get(`${apiBaseUrl}/statistical/sold`, {
+            headers: {
+                // token: Cookies.get('token'),
+                Authorization: getCookie('Authorization'),
+            },
+        });
+    };
+
+    const fetchQuantity = () => {
+        return axios.get(`${apiBaseUrl}/statistical/products/quantity`, {
+            headers: {
+                // token: Cookies.get('token'),
+                Authorization: getCookie('Authorization'),
+            },
+        });
+    };
+
+    const fetchTop3Product = () => {
+        return axios.get(`${apiBaseUrl}/statistical/top3_product`, {
+            headers: {
+                // token: Cookies.get('token'),
+                Authorization: getCookie('Authorization'),
+            },
+        });
+    };
+
+    const fetchTop3Customer = () => {
+        return axios.get(`${apiBaseUrl}/statistical/top3_customer`, {
+            headers: {
+                // token: Cookies.get('token'),
+                Authorization: getCookie('Authorization'),
+            },
+        });
+    };
+
+    React.useEffect(() => {
+        Promise.all([
+            fetchRevenue(),
+            fetchSold(),
+            fetchQuantity(),
+            fetchTop3Product(),
+            fetchTop3Customer(),
+            fetchHistory(),
+            fetchNewOrders(),
+            fetchNewCustomers(),
+        ])
+            .then((responses) => {
+                const revenue = responses[0].data;
+                setRevenue(revenue);
+                const sold = responses[1].data;
+                setSold(sold);
+                const quantity = responses[2].data;
+                setQuantity(quantity);
+                const top3Product = responses[3].data;
+                setTopProduct(top3Product);
+                const top3Customer = responses[4].data;
+                setTopCustomer(top3Customer);
+                console.log(revenue, sold, quantity, top3Product, top3Customer);
+                setHistory(responses[5].data);
+                setNewOrders(responses[6].data);
+                setNewCustomers(responses[7].data);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }, []);
+
+    React.useEffect(() => {
+        axios
+            .get(`${apiBaseUrl}/statistical/revenue_by_period?end%20date=${end}&start%20date=${start}`, {
+                headers: {
+                    // token: Cookies.get('token'),
+                    Authorization: getCookie('Authorization'),
+                },
+            })
+            .then((response) => {
+                console.log(response.data);
+                setData(response.data);
+            })
+            .catch((error) => console.log(error));
+    }, [filter]);
+    return (
+        <div style={{ paddingTop: '2px', display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', width: '900px' }}>
+                <div style={{ display: 'flex' }}>
+                    <BoxItem
+                        title={'Doanh thu'}
+                        content={<Numeral value={revenue} format={'0,0'} />}
+                        backgroundColor={'#0089FF'}
+                        icon={
+                            <AttachMoneyIcon
+                                sx={{
+                                    width: '72px',
+                                    height: '72px',
+                                    backgroundColor: '#0089FF',
+                                    color: 'white',
+                                    borderRadius: '50%',
+                                }}
+                            />
+                        }
+                    />
+                    <BoxItem
+                        title={'Đơn hàng mới'}
+                        content={newOrders}
+                        backgroundColor={'#0FD186'}
+                        icon={
+                            <ShoppingBasketIcon
+                                sx={{
+                                    width: '72px',
+                                    height: '72px',
+                                    backgroundColor: '#0FD186',
+                                    color: 'white',
+                                    borderRadius: '50%',
+                                }}
+                            />
+                        }
+                    />
+                    <BoxItem
+                        title={'Khách hàng mới'}
+                        content={newCustomers}
+                        backgroundColor={'#FFB92A'}
+                        icon={
+                            <Person3Icon
+                                sx={{
+                                    width: '72px',
+                                    height: '72px',
+                                    backgroundColor: '#FFB92A',
+                                    color: 'white',
+                                    borderRadius: '50%',
+                                }}
+                            />
+                        }
+                        noMargin
+                    />
+                </div>
+                {/* column chart */}
+                <Paper
+                    sx={{
+                        marginTop: '31px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                    }}
+                >
+                    <div
+                        style={{
+                            width: '88%',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            margin: '20px 0',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <span style={{ fontSize: '24px', color: '#0088FF' }}>Doanh thu bán hàng</span>
+                        <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                            <Select value={filter} onChange={handleChange} displayEmpty>
+                                <MenuItem value={7}>7 ngày</MenuItem>
+                                <MenuItem value={30}>1 tháng</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </div>
+                    <div style={{ width: '88%', marginBottom: '16px' }}>
+                        <Bar
+                            data={{
+                                labels: labels,
+                                datasets: [
+                                    {
+                                        label: 'Doanh thu',
+                                        data: data,
+                                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        borderWidth: 1,
+                                    },
+                                ],
+                            }}
+                            options={options}
+                        />
+                    </div>
+                    <h4 style={{ textAlign: 'center' }}>
+                        Tổng doanh thu:
+                        <Numeral
+                            value={data?.reduce((accumulator, currentValue) => accumulator + currentValue) || '0'}
+                            // value={0}
+                            format={'0,0'}
+                        />
+                    </h4>
+                </Paper>
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        marginTop: '30px',
+                        textAlign: 'center',
+                        marginBottom: '23px',
+                    }}
+                >
+                    <Paper sx={{ width: 'calc((100% - 30px) / 2)' }}>
+                        <h3>Top Khách hàng</h3>
+                        <List dense={true} sx={{ paddingBottom: '10px' }}>
+                            {topCustomer?.map((item, key) => {
+                                let color = 'black';
+                                switch (key) {
+                                    case 0:
+                                        color = '#FF0000';
+                                        break;
+                                    case 1:
+                                        color = '#FFA500';
+                                        break;
+                                    case 2:
+                                        color = '#FFD700';
+                                        break;
+                                    case 3:
+                                        color = '#00FF00';
+                                        break;
+                                    case 4:
+                                        color = '#0000FF';
+                                        break;
+                                }
+                                return (
+                                    <ListItem
+                                        key={key}
+                                        secondaryAction={
+                                            <span style={{ fontSize: '18px' }}>
+                                                {<Numeral value={item[1]} format={'0,0'} />}
+                                            </span>
+                                        }
+                                        sx={{ fontSize: '18px' }}
+                                    >
+                                        <ListItemAvatar>
+                                            <Avatar
+                                                sx={{
+                                                    color: color,
+                                                    backgroundColor: 'white',
+                                                    border: '1px solid',
+                                                    borderColor: color,
+                                                }}
+                                            >
+                                                {key + 1}
+                                            </Avatar>
+                                        </ListItemAvatar>
+                                        <ListItemText primary={<span style={{ fontSize: '18px' }}>{item[0]}</span>} />
+                                    </ListItem>
+                                );
+                            })}
+                        </List>
+                    </Paper>
+                    <Paper sx={{ width: 'calc((100% - 30px) / 2)' }}>
+                        <h3>Top sản phẩm</h3>
+                        <List dense={true} sx={{ paddingBottom: '10px' }}>
+                            {topProduct?.map((item, key) => {
+                                let color = 'black';
+                                switch (key) {
+                                    case 0:
+                                        color = '#FF0000';
+                                        break;
+                                    case 1:
+                                        color = '#FFA500';
+                                        break;
+                                    case 2:
+                                        color = '#FFD700';
+                                        break;
+                                    case 3:
+                                        color = '#00FF00';
+                                        break;
+                                    case 4:
+                                        color = '#0000FF';
+                                        break;
+                                }
+                                return (
+                                    <ListItem
+                                        key={key}
+                                        secondaryAction={
+                                            <span style={{ fontSize: '18px' }}>
+                                                {<Numeral value={item[1]} format={'0,0'} />}
+                                            </span>
+                                        }
+                                        sx={{ fontSize: '18px' }}
+                                    >
+                                        <ListItemAvatar>
+                                            <Avatar
+                                                sx={{
+                                                    color: color,
+                                                    backgroundColor: 'white',
+                                                    border: '1px solid',
+                                                    borderColor: color,
+                                                }}
+                                            >
+                                                {key + 1}
+                                            </Avatar>
+                                        </ListItemAvatar>
+                                        <ListItemText primary={<span style={{ fontSize: '18px' }}>{item[0]}</span>} />
+                                    </ListItem>
+                                );
+                            })}
+                        </List>
+                    </Paper>
+                </div>
+            </div>
+            <Paper sx={{ width: '288px', height: '460px', marginLeft: 'auto', marginLeft: '30px' }}>
+                <h3 style={{ textAlign: 'center' }}>Hoạt động gần đây</h3>
+                <Timeline
+                    sx={{
+                        [`& .${timelineOppositeContentClasses.root}`]: {
+                            flex: 0,
+                        },
+                        marginBottom: '0px',
+                    }}
+                >
+                    {history?.map((item, key) => {
+                        return (
+                            <TimelineItem key={key}>
+                                <TimelineOppositeContent />
+                                <TimelineSeparator>
+                                    <TimelineDot sx={{ backgroundColor: 'primary.main' }} />
+                                    {key === 4 ? '' : <TimelineConnector sx={{ backgroundColor: 'primary.main' }} />}
+                                </TimelineSeparator>
+                                <TimelineContent>{item?.staffName + ' vừa ' + item?.operation}</TimelineContent>
+                            </TimelineItem>
+                        );
+                    })}
+                </Timeline>
+                <ArrowCircleRightOutlinedIcon
+                    sx={{ float: 'right', marginRight: '10px', width: '30px', height: '30px', color: 'primary.main' }}
+                />
+            </Paper>
+        </div>
+    );
+}
+
+export default DashBoard;

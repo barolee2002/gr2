@@ -1,0 +1,125 @@
+.logo {
+    height: 100%;
+    // width: 50px;
+    // background-color: #fff;
+    display: flex;
+    // justify-content: flex-start;
+    align-items: center;
+
+    img {
+        height: 70px;
+        width: auto;
+    }
+}
+
+.Nav {
+    // background-color: #0964CF;
+    background-color: #1976D2;
+    display: flex;
+    justify-content: space-between;
+    
+    .addProduct{
+        color: #fff;
+        display: flex;
+        align-items: flex-end;
+
+        
+        
+        .result_search {
+            position:fixed;
+            top: 100px;
+            left: 75px;
+        }
+    }
+    .orders{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    // .tabs:focus {
+    //     background-color: #fff;
+    // }
+
+    .MuiTabs-root .MuiTab-root {
+        color: #FFFFFF;
+    }
+    
+    .MuiTabs-root .Mui-selected {
+        background-color: #2196F3;
+    }
+
+    .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+        border-color: #FFFFFF;
+    }
+    
+    .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+        border-color: #FFFFFF;
+    }
+
+    .MuiInputLabel-root {
+        color: #FFFFFF;
+    }
+    
+    .MuiInputLabel-shrink {
+        color: #FFFFFF;
+    }
+    
+    .addOrder:hover {
+        cursor: pointer;
+    }
+    .user{
+        margin-right: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content:center;
+        color:white;
+
+        div{
+            display: flex;
+            justify-content:flex-start;
+            align-items: center;
+        }
+    }
+
+
+}
+
+.body1 {
+    position: relative;
+}
+
+.All {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.404);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.orders {
+    display: flex;
+    height: 100%;
+}
+
+.order_info {
+  p{
+    span{
+        font-weight: bold;
+    }
+  }
+  .order_info_line{
+    display: flex;
+    justify-content: space-between;
+    padding: 5px
+  }
+}
+
+.name {
+    margin-left: 10px;
+}
+
+.tabs{
+    height:100%;
+}

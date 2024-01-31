@@ -1,0 +1,11 @@
+.add-modal{
+    display: grid;
+    grid-template-columns: auto auto;
+    gap : 12px 12px;
+}
+.action-btn{
+    display: flex;
+    gap : 0 24px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}

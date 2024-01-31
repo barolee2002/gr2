@@ -1,0 +1,38 @@
+.product {
+    display: flex;
+    margin-top:10px;
+    justify-content: space-between;
+    align-items: center;
+    -webkit-box-shadow: 3px 7px 15px -8px rgba(0,0,0,0.75);
+    -moz-box-shadow: 3px 7px 15px -8px rgba(0,0,0,0.75);
+    box-shadow: 3px 7px 15px -8px rgba(0,0,0,0.75);
+}
+.product1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.number-input {
+    position: relative;
+    width: 100px;
+}
+  
+.number-input__input {
+    border: none;
+    border-bottom: 1px solid black;
+    width: 100%;
+    padding-bottom: 5px;
+    outline: none;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.product_image{
+    img {
+        height: 50px; 
+        width: 50px; 
+    }
+}
