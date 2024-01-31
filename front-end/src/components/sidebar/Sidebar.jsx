@@ -13,8 +13,10 @@ import Collapse from '@mui/material/Collapse';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import Person4Icon from '@mui/icons-material/Person4';
+
 import { height } from '@mui/system';
 
 const cx = classNames.bind(styles);
@@ -71,6 +73,7 @@ function NavbarItem({ title, icon, subTitle, variant, location }) {
 
 function Sidebar() {
     const location = useLocation();
+    const navigate = useNavigate()
 
     return (
         <Box className={cx('sidebar')}>
@@ -127,6 +130,14 @@ function Sidebar() {
                         { title: 'Đặt hàng', path: '/inventory/booking' },
                         { title: 'Nhập hàng', path: '/inventory/receipt_inventory' },
                         { title: 'Kiểm hàng', path: '/inventory/check_inventory' },
+                    ]}
+                />
+                <NavbarItem
+                    location={location}
+                    title={'Quản lý Nhân viên'}
+                    icon={<Person4Icon />}
+                    subTitle={[
+                        { title: 'Nhân viên', path: '/staff' },
                     ]}
                 />
             </Stack>

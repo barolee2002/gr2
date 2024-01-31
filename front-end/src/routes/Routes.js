@@ -25,6 +25,7 @@ import ReceiptInventoryDetail from '../pages/receiptInventoryDetail/ReceiptInven
 import ReportForSalesStaff from '../pages/ReportForSalesStaff/ReportForSalesStaff';
 import Category from '../pages/caegory/Category';
 import BookingDetail from '../pages/bookingDetail/BookingDetail';
+import Staff from '../pages/Staff';
 
 export const publicRoutes = [
     {path: '/', element : Login},
@@ -52,4 +53,6 @@ export const publicRoutes = [
     { path: '/orders/:code', element: orderDetails, layout: DefaultLayout },
     { path: '/report', element: ReportPage, layout: DefaultLayout },
     { path: '/report/staff', element: ReportForSalesStaff, layout: DefaultLayout },
+    { path: '/staff', element: Staff, layout: DefaultLayout },
+
 ];

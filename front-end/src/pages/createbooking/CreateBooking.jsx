@@ -38,6 +38,7 @@ import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import AddSupplierModal from '../../components/modal/AddSupplierModal';
 import AddStorageModal from '../../components/modal/AddStorage';
+import './style.scss';
 
 const initSupplierState = {
     name: '',
@@ -395,7 +396,7 @@ function CreateBooking() {
                     marginTop: '10px',
                     flexDirection: 'column',
                     backgroundColor: 'white',
-                    position:"relative"
+                    position: 'relative',
                 }}
                 borderRadius={'6px'}
             >
@@ -445,7 +446,14 @@ function CreateBooking() {
                 {search.length !== 0 ? (
                     <div
                         className="result_search"
-                        style={{ position: 'absolute', width: '50%', height: '400px', overflow: 'hidden', zIndex: "100", top: "50px" }}
+                        style={{
+                            position: 'absolute',
+                            width: '50%',
+                            height: '400px',
+                            overflow: 'hidden',
+                            zIndex: '100',
+                            top: '50px',
+                        }}
                     >
                         {search?.map((product, key) => {
                             return (
@@ -535,7 +543,15 @@ function CreateBooking() {
                                                 onChange={(event, e) => {
                                                     handleEditProduct(row.productName, row.size, row.color, 'size', e);
                                                 }}
-                                                onInputChange={(e, value) => handleEditProduct(row.productName, row.size, row.color, 'size', value)}
+                                                onInputChange={(e, value) =>
+                                                    handleEditProduct(
+                                                        row.productName,
+                                                        row.size,
+                                                        row.color,
+                                                        'size',
+                                                        value,
+                                                    )
+                                                }
                                                 sx={{ width: '80%' }}
                                                 renderInput={(params) => (
                                                     <TextField
@@ -556,7 +572,15 @@ function CreateBooking() {
                                                 onChange={(event, e) => {
                                                     handleEditProduct(row.productName, row.size, row.color, 'color', e);
                                                 }}
-                                                onInputChange={(e, value) => handleEditProduct(row.productName, row.size, row.color, 'color', value)}
+                                                onInputChange={(e, value) =>
+                                                    handleEditProduct(
+                                                        row.productName,
+                                                        row.size,
+                                                        row.color,
+                                                        'color',
+                                                        value,
+                                                    )
+                                                }
                                                 sx={{ width: '100%' }}
                                                 renderInput={(params) => (
                                                     <TextField
@@ -577,32 +601,29 @@ function CreateBooking() {
                                         </TableCell>
 
                                         <TableCell align="center">
-                                            <TextField
-                                                align="center"
-                                                type="text"
-                                                sx={{ width: '100%' }}
-                                                variant="standard"
-                                                value={row.originalCost !== 0 ? row.originalCost.toLocaleString() : ''}
+                                            <NumericFormat
+                                                format="TextField"
+                                                className="number-textfiled"
+                                                thousandSeparator=","
+                                                value={row.originalCost !== 0 ? row.originalCost : undefined}
                                                 onChange={(e) => {
-                                                    const valueWithoutCommas = e.target.value.replace(/,/g, '');
-                                                    setOriginalCost(valueWithoutCommas);
+                                                    console.log(e.target.value);
                                                     handleEditProduct(
                                                         row.productName,
                                                         row.size,
                                                         row.color,
                                                         'originalCost',
-                                                        parseInt(valueWithoutCommas),
+                                                        parseInt(e.target.value.replace(/,/g, ''), 10),
                                                     );
                                                 }}
-                                            ></TextField>
+                                            />
                                         </TableCell>
                                         <TableCell align="center">
-                                            <TextField
-                                                align="center"
-                                                type="text"
-                                                sx={{ width: '100%' }}
-                                                variant="standard"
-                                                value={row.quantity !== 0 ? row.quantity.toLocaleString() : ''}
+                                            <NumericFormat
+                                                format="TextField"
+                                                className="number-textfiled"
+                                                thousandSeparator=","
+                                                value={row.quantity}
                                                 onChange={(e) => {
                                                     const valueWithoutCommas = e.target.value.replace(/,/g, '');
                                                     setQuantity(valueWithoutCommas);
@@ -611,10 +632,10 @@ function CreateBooking() {
                                                         row.size,
                                                         row.color,
                                                         'quantity',
-                                                        parseInt(valueWithoutCommas),
+                                                        parseInt(e.target.value.replace(/,/g, ''), 10),
                                                     );
                                                 }}
-                                            ></TextField>
+                                            />
                                         </TableCell>
                                         <TableCell align="center">
                                             <TextField
@@ -684,7 +705,7 @@ function CreateBooking() {
                 onClose={handleCloseModal}
                 storage={storage}
                 changeInfo={changeStorageInfo}
-                onConfirm = {handleAddStorage}
+                onConfirm={handleAddStorage}
             />
         </Box>
     );

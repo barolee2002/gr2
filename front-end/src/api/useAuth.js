@@ -31,7 +31,7 @@ export const useLogin = ({ onSuccess, onError }) => {
 
             const code = userInfo.data.code;
             const staffname = userInfo.data.name;
-            login(authResult.data.code,accessToken, username, code, staffname);
+            login(authResult.data.code,accessToken, username, code, staffname, userInfo.data.role);
             return true;
         },
         onSuccess,

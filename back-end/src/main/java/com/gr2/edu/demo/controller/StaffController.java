@@ -39,4 +39,8 @@ public class StaffController {
     public Staff getStaffById(@PathVariable String id){
         return staffServicce.getStaffLogin(id);
     }
+    @GetMapping("/list-staff")
+    public List<UserDtoResponse> getAllStaffNotADMIN() {
+        return staffServicce.getAllStaff();
+    }
 }

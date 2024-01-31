@@ -679,7 +679,7 @@ function SalesInShop() {
                     </Grid>
                     <Grid xs={4} sx={{ backgroundColor: 'white', height: '85.5vh', paddingLeft: '3px' }}>
                         {orders[value]?.customer === null ? (
-                            <div className="addCustomer">
+                            <Box className="addCustomer" sx = {{position: 'relative'}}>
                                 <TextField
                                     label="Thêm khách hàng"
                                     id="outlined-start-adornment"
@@ -701,7 +701,7 @@ function SalesInShop() {
                                         ),
                                     }}
                                 />
-                                <div className="result_search">
+                                <Box className="result_search" sx ={{position : "absolute", top: '64px', width : '92%', border : "1px solid #ddd"}}>
                                     <Card sx={{ minWidth: 275 }}>
                                         {customers.map((customer) => {
                                             return (
@@ -717,8 +717,8 @@ function SalesInShop() {
                                         })}
                                         {search !== '' ? <RetailCustomers /> : <></>}
                                     </Card>
-                                </div>
-                            </div>
+                                </Box>
+                            </Box>
                         ) : (
                             <Customer customer={orders[value]?.customer} handleDeleteCustomer={handleDeleteCustomer} />
                         )}

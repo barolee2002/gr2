@@ -20,8 +20,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -86,6 +88,16 @@ public class StaffServicce {
                 .code(userOptional.get().getCode())
                 .accessToken(jwt)
                 .build();
+    }
+
+    public List<UserDtoResponse> getAllStaff() {
+        List<Staff> staffs = staffRepository.findAll();
+        staffs = staffs.stream().map(staff -> {
+            if (!staff.getRole().equals("ADMIN")) {
+                return staff;
+            } else { return null;}
+        }).collect(Collectors.toList());
+        return Arrays.asList(mapper.map(staffs, UserDtoResponse[].class));
     }
 }
 
